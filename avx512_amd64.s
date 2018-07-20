@@ -15,10 +15,10 @@
 
 // func encodeAVX512(dst []byte, src [][]byte)
 TEXT ·encodeAVX512(SB), NOSPLIT, $0
-    MOVQ  dst+0(FP), dst
-	MOVQ  d2src+24(FP), d2src
-	MOVQ  csrc+32(FP), csrc
-	MOVQ  len+8(FP), len
+    MOVQ  d+0(FP), dst
+	MOVQ  src+24(FP), d2src
+	MOVQ  c+32(FP), csrc
+	MOVQ  l+8(FP), len
 	TESTQ $255, len
 	JNZ   not_aligned
 
@@ -42,10 +42,10 @@ next_vect:
 	VMOVDQU8 64(src_tmp)(pos*1), Z5
 	VMOVDQU8 128(src_tmp)(pos*1), Z6
 	VMOVDQU8 192(src_tmp)(pos*1), Z7
-	VPXOR   Z4, Z0, Z0
-	VPXOR   Z5, Z1, Z1
-	VPXOR   Z6, Z2, Z2
-	VPXOR   Z7, Z3, Z3
+	VPXORQ   Z4, Z0, Z0
+	VPXORQ   Z5, Z1, Z1
+	VPXORQ   Z6, Z2, Z2
+	VPXORQ   Z7, Z3, Z3
 	SUBQ    $1, csrc_tmp
 	JGE     next_vect
 
@@ -120,10 +120,10 @@ ret:
 
 // func encodeAVX512NonTmp(dst []byte, src [][]byte)
 TEXT ·encodeAVX512NonTmp(SB), NOSPLIT, $0
-    MOVQ  dst+0(FP), dst
-	MOVQ  d2src+24(FP), d2src
-	MOVQ  csrc+32(FP), csrc
-	MOVQ  len+8(FP), len
+    MOVQ  d+0(FP), dst
+	MOVQ  src+24(FP), d2src
+	MOVQ  c+32(FP), csrc
+	MOVQ  l+8(FP), len
 	TESTQ $255, len
 	JNZ   not_aligned
 
@@ -147,10 +147,10 @@ next_vect:
 	VMOVDQU8 64(src_tmp)(pos*1), Z5
 	VMOVDQU8 128(src_tmp)(pos*1), Z6
 	VMOVDQU8 192(src_tmp)(pos*1), Z7
-	VPXOR   Z4, Z0, Z0
-	VPXOR   Z5, Z1, Z1
-	VPXOR   Z6, Z2, Z2
-	VPXOR   Z7, Z3, Z3
+	VPXORQ   Z4, Z0, Z0
+	VPXORQ   Z5, Z1, Z1
+	VPXORQ   Z6, Z2, Z2
+	VPXORQ   Z7, Z3, Z3
 	SUBQ    $1, csrc_tmp
 	JGE     next_vect
 

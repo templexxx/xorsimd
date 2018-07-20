@@ -15,10 +15,10 @@
 
 // func encodeAVX2(dst []byte, src [][]byte)
 TEXT ·encodeAVX2(SB), NOSPLIT, $0
-    MOVQ  dst+0(FP), dst
-	MOVQ  d2src+24(FP), d2src
-	MOVQ  csrc+32(FP), csrc
-	MOVQ  len+8(FP), len
+    MOVQ  d+0(FP), dst
+	MOVQ  s+24(FP), d2src
+	MOVQ  c+32(FP), csrc
+	MOVQ  l+8(FP), len
 	TESTQ $127, len
 	JNZ   not_aligned
 
@@ -120,10 +120,10 @@ ret:
 
 // func encodeAVX2NonTmp(dst []byte, src [][]byte)
 TEXT ·encodeAVX2NonTmp(SB), NOSPLIT, $0
-    MOVQ  dst+0(FP), dst
-	MOVQ  d2src+24(FP), d2src
-	MOVQ  csrc+32(FP), csrc
-	MOVQ  len+8(FP), len
+    MOVQ  d+0(FP), dst
+	MOVQ  src+24(FP), d2src
+	MOVQ  c+32(FP), csrc
+	MOVQ  l+8(FP), len
 	TESTQ $127, len
 	JNZ   not_aligned
 

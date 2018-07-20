@@ -15,33 +15,33 @@
 
 // func encodeSSE2(dst []byte, src [][]byte)
 TEXT ·encodeSSE2(SB), NOSPLIT, $0
-	MOVQ  dst+0(FP), dst
-	MOVQ  d2src+24(FP), d2src
-	MOVQ  csrc+32(FP), csrc
-	MOVQ  len+8(FP), len
+	MOVQ  d+0(FP), dst
+	MOVQ  src+24(FP), d2src
+	MOVQ  c+32(FP), csrc
+	MOVQ  l+8(FP), len
 	TESTQ $63, len
 	JNZ   not_aligned
 
 aligned:
-	MOVQ $0, POS
+	MOVQ $0, pos
 
 loop64b:
 	MOVQ  csrc, csrc_tmp
 	SUBQ  $2, csrc_tmp
 	MOVQ  $0, d2src_off
 	MOVQ  (d2src)(d2src_off*1), src_tmp
-	MOVOU (src_tmp)(POS*1), X0
-	MOVOU 16(src_tmp)(POS*1), X1
-	MOVOU 32(src_tmp)(POS*1), X2
-	MOVOU 48(src_tmp)(POS*1), X3
+	MOVOU (src_tmp)(pos*1), X0
+	MOVOU 16(src_tmp)(pos*1), X1
+	MOVOU 32(src_tmp)(pos*1), X2
+	MOVOU 48(src_tmp)(pos*1), X3
 
 next_vect:
 	ADDQ  $24, d2src_off
 	MOVQ  (d2src)(d2src_off*1), src_tmp
-	MOVOU (src_tmp)(POS*1), X4
-	MOVOU 16(src_tmp)(POS*1), X5
-	MOVOU 32(src_tmp)(POS*1), X6
-	MOVOU 48(src_tmp)(POS*1), X7
+	MOVOU (src_tmp)(pos*1), X4
+	MOVOU 16(src_tmp)(pos*1), X5
+	MOVOU 32(src_tmp)(pos*1), X6
+	MOVOU 48(src_tmp)(pos*1), X7
 	PXOR  X4, X0
 	PXOR  X5, X1
 	PXOR  X6, X2
@@ -49,13 +49,13 @@ next_vect:
 	SUBQ  $1, csrc_tmp
 	JGE   next_vect
 
-	MOVOU X0, (dst)(POS*1)
-	MOVOU X1, 16(dst)(POS*1)
-	MOVOU X2, 32(dst)(POS*1)
-	MOVOU X3, 48(dst)(POS*1)
+	MOVOU X0, (dst)(pos*1)
+	MOVOU X1, 16(dst)(pos*1)
+	MOVOU X2, 32(dst)(pos*1)
+	MOVOU X3, 48(dst)(pos*1)
 
-	ADDQ $64, POS
-	CMPQ len, POS
+	ADDQ $64, pos
+	CMPQ len, pos
 	JNE  loop64b
 	RET
 
@@ -119,33 +119,33 @@ ret:
 
 // func encodeSSE2NonTmp(dst []byte, src [][]byte)
 TEXT ·encodeSSE2NonTmp(SB), NOSPLIT, $0
-	MOVQ  dst+0(FP), dst
-	MOVQ  d2src+24(FP), d2src
-	MOVQ  csrc+32(FP), csrc
-	MOVQ  len+8(FP), len
+	MOVQ  d+0(FP), dst
+	MOVQ  src+24(FP), d2src
+	MOVQ  c+32(FP), csrc
+	MOVQ  l+8(FP), len
 	TESTQ $63, len
 	JNZ   not_aligned
 
 aligned:
-	MOVQ $0, POS
+	MOVQ $0, pos
 
 loop64b:
 	MOVQ  csrc, csrc_tmp
 	SUBQ  $2, csrc_tmp
 	MOVQ  $0, d2src_off
 	MOVQ  (d2src)(d2src_off*1), src_tmp
-	MOVOU (src_tmp)(POS*1), X0
-	MOVOU 16(src_tmp)(POS*1), X1
-	MOVOU 32(src_tmp)(POS*1), X2
-	MOVOU 48(src_tmp)(POS*1), X3
+	MOVOU (src_tmp)(pos*1), X0
+	MOVOU 16(src_tmp)(pos*1), X1
+	MOVOU 32(src_tmp)(pos*1), X2
+	MOVOU 48(src_tmp)(pos*1), X3
 
 next_vect:
 	ADDQ  $24, d2src_off
 	MOVQ  (d2src)(d2src_off*1), src_tmp
-	MOVOU (src_tmp)(POS*1), X4
-	MOVOU 16(src_tmp)(POS*1), X5
-	MOVOU 32(src_tmp)(POS*1), X6
-	MOVOU 48(src_tmp)(POS*1), X7
+	MOVOU (src_tmp)(pos*1), X4
+	MOVOU 16(src_tmp)(pos*1), X5
+	MOVOU 32(src_tmp)(pos*1), X6
+	MOVOU 48(src_tmp)(pos*1), X7
 	PXOR  X4, X0
 	PXOR  X5, X1
 	PXOR  X6, X2
@@ -153,13 +153,13 @@ next_vect:
 	SUBQ  $1, csrc_tmp
 	JGE   next_vect
 
-	LONG $0xe70f4266; WORD $0x0304  // MOVNTDQ X0, (dst)(POS*1)
-	LONG $0xe70f4266; WORD $0x034c; BYTE $0x10  // MOVNTDQ X1, 16(dst)(POS*1)
-	LONG $0xe70f4266; WORD $0x0354; BYTE $0x20  // MOVNTDQ X2, 32(dst)(POS*1)
-	LONG $0xe70f4266; WORD $0x035c; BYTE $0x30  // MOVNTDQ X3, 48(dst)(POS*1)
+	LONG $0xe70f4266; WORD $0x0304  // MOVNTDQ X0, (dst)(pos*1)
+	LONG $0xe70f4266; WORD $0x034c; BYTE $0x10  // MOVNTDQ X1, 16(dst)(pos*1)
+	LONG $0xe70f4266; WORD $0x0354; BYTE $0x20  // MOVNTDQ X2, 32(dst)(pos*1)
+	LONG $0xe70f4266; WORD $0x035c; BYTE $0x30  // MOVNTDQ X3, 48(dst)(pos*1)
 
-	ADDQ $64, POS
-	CMPQ len, POS
+	ADDQ $64, pos
+	CMPQ len, pos
 	JNE  loop64b
 	RET
 
