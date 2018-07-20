@@ -73,4 +73,3 @@ func encodeSSE2NonTmp(dst []byte, src [][]byte)
 
 //go:noescape
 func encodeSSE2(dst []byte, src [][]byte)
-

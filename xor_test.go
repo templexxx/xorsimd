@@ -94,8 +94,8 @@ func verifyEncode(t *testing.T, dataCnt int, cpuFeature int) {
 }
 
 func BenchmarkEncode(b *testing.B) {
-	sizes := []int{4 * kb, 64 * kb, mb}
-	b.Run("", benchEncRun(benchEnc, testDataCnt, sizes))
+	sizes := []int{4 * kb, 64 * kb}
+	b.Run("", benchEncRun(benchEnc, 5, sizes))
 }
 
 func benchEncRun(f func(*testing.B, int, int), dataCnt int, sizes []int) func(*testing.B) {
