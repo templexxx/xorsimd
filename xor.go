@@ -1,0 +1,25 @@
+package xor
+
+// Encode encodes elements from source slice into a
+// destination slice. The source and destination may overlap.
+// Encode returns the number of elements encoded, which will be the minimum of
+// len(src[i]) and len(dst).
+func Encode(dst []byte, src [][]byte) (n int) {
+	n = len(dst)
+	for i := range src {
+		if len(src[i]) < n {
+			n = len(src[i])
+		}
+	}
+
+	if n <= 0 {
+		return 0
+	}
+
+	dst = dst[:n]
+	for i := range src {
+		src[i] = src[i][:n]
+	}
+	encode(dst, src)
+	return
+}
