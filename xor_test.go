@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"testing"
 
-	"errors"
 	cpu "github.com/templexxx/cpufeat"
 )
 
@@ -20,58 +19,69 @@ const (
 
 func TestVerifyEncode(t *testing.T) {
 	if cpu.X86.HasAVX512 {
-		verifyEncode(t, testDataCnt, "avx512")
-		verifyEncode(t, testDataCnt, "avx2")
-		verifyEncode(t, testDataCnt, "sse2")
+		verifyEncode(t, testDataCnt, avx512)
+		verifyEncode(t, testDataCnt, avx2)
+		verifyEncode(t, testDataCnt, sse2)
+		verifyEncode(t, testDataCnt, base)
 	}
 	if cpu.X86.HasAVX2 {
-		verifyEncode(t, testDataCnt, "avx2")
-		verifyEncode(t, testDataCnt, "sse2")
+		verifyEncode(t, testDataCnt, avx2)
+		verifyEncode(t, testDataCnt, sse2)
+		verifyEncode(t, testDataCnt, base)
 	} else if cpu.X86.HasSSE2 {
-		verifyEncode(t, testDataCnt, "sse2")
+		verifyEncode(t, testDataCnt, sse2)
+		verifyEncode(t, testDataCnt, base)
 	} else {
-		err := errors.New("need SSE2")
-		t.Fatal(err)
+		verifyEncode(t, testDataCnt, base)
 	}
 }
 
-func verifyEncode(t *testing.T, dataCnt int, cpuFeature string) {
+func verifyEncode(t *testing.T, dataCnt int, cpuFeature int) {
 	for size := 1; size <= verifySize; size++ {
 		expect := make([]byte, size)
 		result := make([]byte, size)
-		data := make([][]byte, dataCnt)
+		src := make([][]byte, dataCnt)
 		for j := 0; j < dataCnt; j++ {
-			data[j] = make([]byte, size)
+			src[j] = make([]byte, size)
 			rand.Seed(int64(j))
-			fillRandom(data[j])
+			fillRandom(src[j])
 		}
 		for j := 0; j < size; j++ {
-			expect[j] = data[0][j] ^ data[1][j]
+			expect[j] = src[0][j] ^ src[1][j]
 		}
 		for j := 2; j < dataCnt; j++ {
 			for k := 0; k < size; k++ {
-				expect[k] ^= data[j][k]
+				expect[k] ^= src[j][k]
 			}
 		}
-		var ifNonTmp bool
-		if len(result) > nonTmpSize {
-			ifNonTmp = true
-		} else {
-			ifNonTmp = false
+		var nonTmp bool
+		if size > nonTmpSize {
+			nonTmp = true
 		}
-		if cpuFeature == "avx2" {
-			if ifNonTmp {
-				encodeAVX2NonTmp(result, data)
+
+		switch cpuFeature {
+		case avx512:
+			if nonTmp {
+				encodeAVX512NonTmp(result, src)
 			} else {
-				encodeAVX2(result, data)
+				encodeAVX512(result, src)
 			}
-		} else {
-			if ifNonTmp {
-				encodeSSE2NonTmp(result, data)
+		case avx2:
+			if nonTmp {
+				encodeAVX2NonTmp(result, src)
 			} else {
-				encodeSSE2(result, data)
+				encodeAVX2(result, src)
 			}
+		case sse2:
+			if nonTmp {
+				encodeSSE2NonTmp(result, src)
+			} else {
+				encodeSSE2(result, src)
+			}
+		case base:
+			encodeNoSIMD(result, src)
 		}
+
 		if !bytes.Equal(expect, result) {
 			t.Fatalf("encode mismatch; size: %d; ext: %s", size, cpuFeature)
 		}
@@ -79,7 +89,7 @@ func verifyEncode(t *testing.T, dataCnt int, cpuFeature string) {
 }
 
 func BenchmarkEncode(b *testing.B) {
-	sizes := []int{4 * kb, 4 * mb}
+	sizes := []int{4 * kb, 64 * kb, mb}
 	b.Run("", benchEncRun(benchEnc, testDataCnt, sizes))
 }
 
@@ -118,4 +128,3 @@ func fillRandom(p []byte) {
 		}
 	}
 }
-
