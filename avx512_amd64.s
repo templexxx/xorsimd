@@ -25,7 +25,7 @@ TEXT ·encodeAVX512(SB), NOSPLIT, $0
 aligned:
 	MOVQ $0, pos
 
-loop128b:
+loop256b:
 	MOVQ    csrc, csrc_tmp	// store src_cnt -> csrc_tmp
 	SUBQ    $2, csrc_tmp
 	MOVQ    $0, d2src_off
@@ -56,7 +56,7 @@ next_vect:
 
 	ADDQ $256, pos
 	CMPQ len, pos
-	JNE  loop128b
+	JNE  loop256b
 	VZEROUPPER
 	RET
 
@@ -130,7 +130,7 @@ TEXT ·encodeAVX512NonTmp(SB), NOSPLIT, $0
 aligned:
 	MOVQ $0, pos
 
-loop128b:
+loop256b:
 	MOVQ    csrc, csrc_tmp	// store src_cnt -> csrc_tmp
 	SUBQ    $2, csrc_tmp
 	MOVQ    $0, d2src_off
@@ -161,7 +161,7 @@ next_vect:
 
 	ADDQ $256, pos
 	CMPQ len, pos
-	JNE  loop128b
+	JNE  loop256b
 	VZEROUPPER
 	RET
 
