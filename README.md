@@ -7,7 +7,7 @@ more than 200GB/S per core
 ## Introduction:
 
 1. Use SIMD (SSE2 or AVX2 or AVX512) for speeding up
-2. ...
+2. Go1.11
 
 ## Installation
 To get the package use the standard:
