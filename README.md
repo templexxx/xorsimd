@@ -33,6 +33,7 @@ Example of performance on my AWS c5d.large
 speed = ( shards * size ) / cost
 ```
 | data_shards    | shard_size |speed (MB/S) |
+|----------------|------------|-------------|
 |5               |    4KB     |207751.51    |
 |5               |    64KB    |98743.27     |
 
