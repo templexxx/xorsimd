@@ -162,6 +162,7 @@ next_vect:
 	ADDQ $128, pos
 	CMPQ len, pos
 	JNE  loop128b
+	SFENCE
 	VZEROUPPER
 	RET
 

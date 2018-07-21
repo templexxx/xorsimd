@@ -161,6 +161,7 @@ next_vect:
 	ADDQ $64, pos
 	CMPQ len, pos
 	JNE  loop64b
+	SFENCE
 	RET
 
 loop_1b:
