@@ -1,10 +1,10 @@
 #include "textflag.h"
 
-#define dst BX	// parity's address
-#define d2src SI	// two-dimension src_slice's address
-#define csrc CX	// cnt of src
-#define len DX	// len of vect
-#define pos R8	// job position in vect
+#define dst BX // parity's address
+#define d2src SI // two-dimension src_slice's address
+#define csrc CX // cnt of src
+#define len DX // len of vect
+#define pos R8 // job position in vect
 
 #define csrc_tmp R9
 #define d2src_off R10
@@ -153,10 +153,10 @@ next_vect:
 	SUBQ  $1, csrc_tmp
 	JGE   next_vect
 
-	LONG $0xe70f4266; WORD $0x0304  // MOVNTDQ X0, (dst)(pos*1)
-	LONG $0xe70f4266; WORD $0x034c; BYTE $0x10  // MOVNTDQ X1, 16(dst)(pos*1)
-	LONG $0xe70f4266; WORD $0x0354; BYTE $0x20  // MOVNTDQ X2, 32(dst)(pos*1)
-	LONG $0xe70f4266; WORD $0x035c; BYTE $0x30  // MOVNTDQ X3, 48(dst)(pos*1)
+	LONG $0xe70f4266; WORD $0x0304             // MOVNTDQ X0, (dst)(pos*1)
+	LONG $0xe70f4266; WORD $0x034c; BYTE $0x10 // MOVNTDQ X1, 16(dst)(pos*1)
+	LONG $0xe70f4266; WORD $0x0354; BYTE $0x20 // MOVNTDQ X2, 32(dst)(pos*1)
+	LONG $0xe70f4266; WORD $0x035c; BYTE $0x30 // MOVNTDQ X3, 48(dst)(pos*1)
 
 	ADDQ $64, pos
 	CMPQ len, pos

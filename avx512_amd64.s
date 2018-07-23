@@ -1,10 +1,10 @@
 #include "textflag.h"
 
-#define dst BX	// parity's address
-#define d2src SI	// two-dimension src_slice's address
-#define csrc CX	// cnt of src
-#define len DX	// len of vect
-#define pos R8	// job position in vect
+#define dst BX // parity's address
+#define d2src SI // two-dimension src_slice's address
+#define csrc CX // cnt of src
+#define len DX // len of vect
+#define pos R8 // job position in vect
 
 #define csrc_tmp R9
 #define d2src_off R10
@@ -15,7 +15,7 @@
 
 // func encodeAVX512(dst []byte, src [][]byte)
 TEXT ·encodeAVX512(SB), NOSPLIT, $0
-    MOVQ  d+0(FP), dst
+	MOVQ  d+0(FP), dst
 	MOVQ  src+24(FP), d2src
 	MOVQ  c+32(FP), csrc
 	MOVQ  l+8(FP), len
@@ -26,18 +26,18 @@ aligned:
 	MOVQ $0, pos
 
 loop256b:
-	MOVQ    csrc, csrc_tmp	// store src_cnt -> csrc_tmp
-	SUBQ    $2, csrc_tmp
-	MOVQ    $0, d2src_off
-	MOVQ    (d2src)(d2src_off*1), src_tmp	// get first src_vect's addr -> src_tmp
+	MOVQ     csrc, csrc_tmp                // store src_cnt -> csrc_tmp
+	SUBQ     $2, csrc_tmp
+	MOVQ     $0, d2src_off
+	MOVQ     (d2src)(d2src_off*1), src_tmp // get first src_vect's addr -> src_tmp
 	VMOVDQU8 (src_tmp)(pos*1), Z0
 	VMOVDQU8 64(src_tmp)(pos*1), Z1
 	VMOVDQU8 128(src_tmp)(pos*1), Z2
 	VMOVDQU8 192(src_tmp)(pos*1), Z3
 
 next_vect:
-	ADDQ    $24, d2src_off	// len(slice) = 24
-	MOVQ    (d2src)(d2src_off*1), src_tmp	// next data_vect
+	ADDQ     $24, d2src_off                // len(slice) = 24
+	MOVQ     (d2src)(d2src_off*1), src_tmp // next data_vect
 	VMOVDQU8 (src_tmp)(pos*1), Z4
 	VMOVDQU8 64(src_tmp)(pos*1), Z5
 	VMOVDQU8 128(src_tmp)(pos*1), Z6
@@ -46,8 +46,8 @@ next_vect:
 	VPXORQ   Z5, Z1, Z1
 	VPXORQ   Z6, Z2, Z2
 	VPXORQ   Z7, Z3, Z3
-	SUBQ    $1, csrc_tmp
-	JGE     next_vect
+	SUBQ     $1, csrc_tmp
+	JGE      next_vect
 
 	VMOVDQU8 Z0, (dst)(pos*1)
 	VMOVDQU8 Z1, 64(dst)(pos*1)
@@ -65,7 +65,7 @@ loop_1b:
 	MOVQ $0, d2src_off
 	MOVQ (d2src)(d2src_off*1), src_tmp
 	SUBQ $2, csrc_tmp
-	MOVB -1(src_tmp)(len*1), src_val0	// encode from the end of src
+	MOVB -1(src_tmp)(len*1), src_val0  // encode from the end of src
 
 next_vect_1b:
 	ADDQ $24, d2src_off
@@ -120,7 +120,7 @@ ret:
 
 // func encodeAVX512NonTmp(dst []byte, src [][]byte)
 TEXT ·encodeAVX512NonTmp(SB), NOSPLIT, $0
-    MOVQ  d+0(FP), dst
+	MOVQ  d+0(FP), dst
 	MOVQ  src+24(FP), d2src
 	MOVQ  c+32(FP), csrc
 	MOVQ  l+8(FP), len
@@ -131,18 +131,18 @@ aligned:
 	MOVQ $0, pos
 
 loop256b:
-	MOVQ    csrc, csrc_tmp	// store src_cnt -> csrc_tmp
-	SUBQ    $2, csrc_tmp
-	MOVQ    $0, d2src_off
-	MOVQ    (d2src)(d2src_off*1), src_tmp	// get first src_vect's addr -> src_tmp
+	MOVQ     csrc, csrc_tmp                // store src_cnt -> csrc_tmp
+	SUBQ     $2, csrc_tmp
+	MOVQ     $0, d2src_off
+	MOVQ     (d2src)(d2src_off*1), src_tmp // get first src_vect's addr -> src_tmp
 	VMOVDQU8 (src_tmp)(pos*1), Z0
 	VMOVDQU8 64(src_tmp)(pos*1), Z1
 	VMOVDQU8 128(src_tmp)(pos*1), Z2
 	VMOVDQU8 192(src_tmp)(pos*1), Z3
 
 next_vect:
-	ADDQ    $24, d2src_off	// len(slice) = 24
-	MOVQ    (d2src)(d2src_off*1), src_tmp	// next data_vect
+	ADDQ     $24, d2src_off                // len(slice) = 24
+	MOVQ     (d2src)(d2src_off*1), src_tmp // next data_vect
 	VMOVDQU8 (src_tmp)(pos*1), Z4
 	VMOVDQU8 64(src_tmp)(pos*1), Z5
 	VMOVDQU8 128(src_tmp)(pos*1), Z6
@@ -151,8 +151,8 @@ next_vect:
 	VPXORQ   Z5, Z1, Z1
 	VPXORQ   Z6, Z2, Z2
 	VPXORQ   Z7, Z3, Z3
-	SUBQ    $1, csrc_tmp
-	JGE     next_vect
+	SUBQ     $1, csrc_tmp
+	JGE      next_vect
 
 	VMOVNTDQ Z0, (dst)(pos*1)
 	VMOVNTDQ Z1, 64(dst)(pos*1)
@@ -171,7 +171,7 @@ loop_1b:
 	MOVQ $0, d2src_off
 	MOVQ (d2src)(d2src_off*1), src_tmp
 	SUBQ $2, csrc_tmp
-	MOVB -1(src_tmp)(len*1), src_val0	// encode from the end of src
+	MOVB -1(src_tmp)(len*1), src_val0  // encode from the end of src
 
 next_vect_1b:
 	ADDQ $24, d2src_off

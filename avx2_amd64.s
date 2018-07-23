@@ -1,10 +1,10 @@
 #include "textflag.h"
 
-#define dst BX	// parity's address
-#define d2src SI	// two-dimension src_slice's address
-#define csrc CX	// cnt of src
-#define len DX	// len of vect
-#define pos R8	// job position in vect
+#define dst BX // parity's address
+#define d2src SI // two-dimension src_slice's address
+#define csrc CX // cnt of src
+#define len DX // len of vect
+#define pos R8 // job position in vect
 
 #define csrc_tmp R9
 #define d2src_off R10
@@ -15,7 +15,7 @@
 
 // func encodeAVX2(dst []byte, src [][]byte)
 TEXT ·encodeAVX2(SB), NOSPLIT, $0
-    MOVQ  d+0(FP), dst
+	MOVQ  d+0(FP), dst
 	MOVQ  s+24(FP), d2src
 	MOVQ  c+32(FP), csrc
 	MOVQ  l+8(FP), len
@@ -26,18 +26,18 @@ aligned:
 	MOVQ $0, pos
 
 loop128b:
-	MOVQ    csrc, csrc_tmp	// store src_cnt -> csrc_tmp
+	MOVQ    csrc, csrc_tmp                // store src_cnt -> csrc_tmp
 	SUBQ    $2, csrc_tmp
 	MOVQ    $0, d2src_off
-	MOVQ    (d2src)(d2src_off*1), src_tmp	// get first src_vect's addr -> src_tmp
+	MOVQ    (d2src)(d2src_off*1), src_tmp // get first src_vect's addr -> src_tmp
 	VMOVDQU (src_tmp)(pos*1), Y0
 	VMOVDQU 32(src_tmp)(pos*1), Y1
 	VMOVDQU 64(src_tmp)(pos*1), Y2
 	VMOVDQU 96(src_tmp)(pos*1), Y3
 
 next_vect:
-	ADDQ    $24, d2src_off	// len(slice) = 24
-	MOVQ    (d2src)(d2src_off*1), src_tmp	// next data_vect
+	ADDQ    $24, d2src_off                // len(slice) = 24
+	MOVQ    (d2src)(d2src_off*1), src_tmp // next data_vect
 	VMOVDQU (src_tmp)(pos*1), Y4
 	VMOVDQU 32(src_tmp)(pos*1), Y5
 	VMOVDQU 64(src_tmp)(pos*1), Y6
@@ -65,7 +65,7 @@ loop_1b:
 	MOVQ $0, d2src_off
 	MOVQ (d2src)(d2src_off*1), src_tmp
 	SUBQ $2, csrc_tmp
-	MOVB -1(src_tmp)(len*1), src_val0	// encode from the end of src
+	MOVB -1(src_tmp)(len*1), src_val0  // encode from the end of src
 
 next_vect_1b:
 	ADDQ $24, d2src_off
@@ -120,7 +120,7 @@ ret:
 
 // func encodeAVX2NonTmp(dst []byte, src [][]byte)
 TEXT ·encodeAVX2NonTmp(SB), NOSPLIT, $0
-    MOVQ  d+0(FP), dst
+	MOVQ  d+0(FP), dst
 	MOVQ  src+24(FP), d2src
 	MOVQ  c+32(FP), csrc
 	MOVQ  l+8(FP), len
@@ -131,18 +131,18 @@ aligned:
 	MOVQ $0, pos
 
 loop128b:
-	MOVQ    csrc, csrc_tmp	// store src_cnt -> csrc_tmp
+	MOVQ    csrc, csrc_tmp                // store src_cnt -> csrc_tmp
 	SUBQ    $2, csrc_tmp
 	MOVQ    $0, d2src_off
-	MOVQ    (d2src)(d2src_off*1), src_tmp	// get first src_vect's addr -> src_tmp
+	MOVQ    (d2src)(d2src_off*1), src_tmp // get first src_vect's addr -> src_tmp
 	VMOVDQU (src_tmp)(pos*1), Y0
 	VMOVDQU 32(src_tmp)(pos*1), Y1
 	VMOVDQU 64(src_tmp)(pos*1), Y2
 	VMOVDQU 96(src_tmp)(pos*1), Y3
 
 next_vect:
-	ADDQ    $24, d2src_off	// len(slice) = 24
-	MOVQ    (d2src)(d2src_off*1), src_tmp	// next data_vect
+	ADDQ    $24, d2src_off                // len(slice) = 24
+	MOVQ    (d2src)(d2src_off*1), src_tmp // next data_vect
 	VMOVDQU (src_tmp)(pos*1), Y4
 	VMOVDQU 32(src_tmp)(pos*1), Y5
 	VMOVDQU 64(src_tmp)(pos*1), Y6
@@ -171,7 +171,7 @@ loop_1b:
 	MOVQ $0, d2src_off
 	MOVQ (d2src)(d2src_off*1), src_tmp
 	SUBQ $2, csrc_tmp
-	MOVB -1(src_tmp)(len*1), src_val0	// encode from the end of src
+	MOVB -1(src_tmp)(len*1), src_val0  // encode from the end of src
 
 next_vect_1b:
 	ADDQ $24, d2src_off
