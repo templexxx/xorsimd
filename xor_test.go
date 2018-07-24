@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"testing"
 
-	cpu "github.com/templexxx/cpufeat"
+	"github.com/templexxx/cpu"
 )
 
 const (
@@ -18,7 +18,7 @@ const (
 )
 
 func TestVerifyEncode(t *testing.T) {
-	if cpu.X86.HasAVX512 {
+	if useAVX512() {
 		verifyEncode(t, testDataCnt, avx512)
 		verifyEncode(t, testDataCnt, avx2)
 		verifyEncode(t, testDataCnt, sse2)
