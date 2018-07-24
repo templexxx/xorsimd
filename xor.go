@@ -2,7 +2,7 @@ package xor
 
 import "github.com/templexxx/cpu"
 
-const enableAVX512 = false
+var EnableAVX512 = false
 
 // Encode encodes elements from source slice into a
 // destination slice. The source and destination may overlap.
@@ -95,7 +95,7 @@ func useAVX512() (ok bool) {
 	if !cpu.X86.HasAVX512DQ {
 		return
 	}
-	if !enableAVX512 {
+	if !EnableAVX512 {
 		return
 	}
 	return true
