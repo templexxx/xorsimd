@@ -28,7 +28,7 @@ Performance depends mainly on:
 2. non-temporal size
 3. hardware ( CPU RAM etc)
 
-Example of performance on my AWS c5d.large
+Example of performance on my AWS c5d.large (enable AVX512)
 ```
 speed = ( shards * size ) / cost
 ```
