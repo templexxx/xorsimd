@@ -28,7 +28,7 @@ func Encode(dst []byte, src [][]byte) (n int) {
 	return
 }
 
-const nonTmpSize = 8 * 1024
+const nonTmpSize = 8 * 1024 // depends on CPU Cache Size
 
 const (
 	avx512 = iota
