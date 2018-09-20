@@ -1,3 +1,5 @@
+// +build !amd64
+
 package xor
 
 import (
@@ -8,7 +10,7 @@ import (
 // split slice for cache-friendly
 const unitSize = 16 * 1024
 
-func encodeNoSIMD(dst []byte, src [][]byte) {
+func encode(dst []byte, src [][]byte) {
 	size := len(dst)
 	start := 0
 	do := unitSize
@@ -46,7 +48,7 @@ func fastXORBytes(dst, a, b []byte, n int) {
 }
 
 const wordSize = int(unsafe.Sizeof(uintptr(0)))
-const supportsUnaligned = runtime.GOARCH == "386" || runtime.GOARCH == "amd64" || runtime.GOARCH == "ppc64" || runtime.GOARCH == "ppc64le" || runtime.GOARCH == "s390x"
+const supportsUnaligned = runtime.GOARCH == "386" || runtime.GOARCH == "ppc64" || runtime.GOARCH == "ppc64le" || runtime.GOARCH == "s390x"
 
 // xor the bytes in a and b. The destination is assumed to have enough space.
 func bytesNoSIMD(dst, a, b []byte, size int) {

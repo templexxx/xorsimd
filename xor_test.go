@@ -22,17 +22,12 @@ func TestVerifyEncode(t *testing.T) {
 		verifyEncode(t, testDataCnt, avx512)
 		verifyEncode(t, testDataCnt, avx2)
 		verifyEncode(t, testDataCnt, sse2)
-		verifyEncode(t, testDataCnt, base)
 	}
 	if cpu.X86.HasAVX2 {
 		verifyEncode(t, testDataCnt, avx2)
 		verifyEncode(t, testDataCnt, sse2)
-		verifyEncode(t, testDataCnt, base)
-	} else if cpu.X86.HasSSE2 {
+	} else  {
 		verifyEncode(t, testDataCnt, sse2)
-		verifyEncode(t, testDataCnt, base)
-	} else {
-		verifyEncode(t, testDataCnt, base)
 	}
 }
 
@@ -82,9 +77,6 @@ func verifyEncode(t *testing.T, dataCnt int, cpuFeature int) {
 			} else {
 				encodeSSE2(result, src)
 			}
-		case base:
-			cpuStr = "base"
-			encodeNoSIMD(result, src)
 		}
 
 		if !bytes.Equal(expect, result) {
