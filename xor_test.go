@@ -39,7 +39,7 @@ func verifyEncode(t *testing.T, dataCnt int, cpuFeature int) {
 		for j := 0; j < dataCnt; j++ {
 			src[j] = make([]byte, size)
 			rand.Seed(int64(j))
-			fillRandom(src[j])
+			rand.Read(src[j])
 		}
 		for j := 0; j < size; j++ {
 			expect[j] = src[0][j] ^ src[1][j]
@@ -106,7 +106,7 @@ func benchEnc(b *testing.B, dataCnt, size int) {
 	for i := 0; i < dataCnt; i++ {
 		data[i] = make([]byte, size)
 		rand.Seed(int64(i))
-		fillRandom(data[i])
+		rand.Read(data[i])
 	}
 	Encode(parity, data)
 	b.SetBytes(int64(dataCnt * size))
@@ -116,12 +116,3 @@ func benchEnc(b *testing.B, dataCnt, size int) {
 	}
 }
 
-func fillRandom(p []byte) {
-	for i := 0; i < len(p); i += 7 {
-		val := rand.Int63()
-		for j := 0; i+j < len(p) && j < 7; j++ {
-			p[i+j] = byte(val)
-			val >>= 8
-		}
-	}
-}

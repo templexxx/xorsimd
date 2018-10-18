@@ -28,6 +28,14 @@ func Encode(dst []byte, src [][]byte) (n int) {
 	return
 }
 
+const nonTmpSize = 8 * 1024 // depends on CPU Cache Size
+
+const (
+	avx512 = iota
+	avx2
+	sse2
+)
+
 func useAVX512() (ok bool) {
 	if !cpu.X86.HasAVX512VL {
 		return

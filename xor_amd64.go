@@ -2,8 +2,6 @@ package xor
 
 import "github.com/templexxx/cpu"
 
-const nonTmpSize = 8 * 1024 // depends on CPU Cache Size
-
 func encode(dst []byte, src [][]byte) {
 
 	var nonTmp bool
@@ -34,12 +32,6 @@ func encode(dst []byte, src [][]byte) {
 	}
 	return
 }
-
-const (
-	avx512 = iota
-	avx2
-	sse2
-)
 
 func getCPUFeature() int {
 	if useAVX512() {
