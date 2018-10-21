@@ -10,7 +10,7 @@ import (
 // split slice for cache-friendly
 const unitSize = 16 * 1024
 
-func encode(dst []byte, src [][]byte) {
+func encode(dst []byte, src [][]byte, feature int) {
 	size := len(dst)
 	start := 0
 	do := unitSize

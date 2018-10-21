@@ -24,17 +24,27 @@ func Encode(dst []byte, src [][]byte) (n int) {
 	for i := range src {
 		src[i] = src[i][:n]
 	}
-	encode(dst, src)
+	f := getCPUFeature()
+	encode(dst, src, f)
 	return
 }
-
-const nonTmpSize = 8 * 1024 // depends on CPU Cache Size
 
 const (
 	avx512 = iota
 	avx2
 	sse2
 )
+
+// TODO: add arm feature...
+func getCPUFeature() int {
+	if useAVX512() {
+		return avx512
+	} else if cpu.X86.HasAVX2 {
+		return avx2
+	}  else {
+		return sse2	// amd64 must has sse2
+	}
+}
 
 func useAVX512() (ok bool) {
 	if !cpu.X86.HasAVX512VL {
@@ -54,3 +64,8 @@ func useAVX512() (ok bool) {
 	}
 	return true
 }
+
+// if size > nonTmpSize, it will use Non-Temporal Hint store
+const nonTmpSize = 8 * 1024 // depends on CPU Cache Size
+
+

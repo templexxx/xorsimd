@@ -49,36 +49,17 @@ func verifyEncode(t *testing.T, dataCnt int, cpuFeature int) {
 				expect[k] ^= src[j][k]
 			}
 		}
-		var nonTmp bool
-		if size > nonTmpSize {
-			nonTmp = true
-		}
 
 		var cpuStr string
 		switch cpuFeature {
 		case avx512:
 			cpuStr = "avx512"
-			if nonTmp {
-				encodeAVX512NonTmp(result, src)
-			} else {
-				encodeAVX512(result, src)
-			}
 		case avx2:
 			cpuStr = "avx2"
-			if nonTmp {
-				encodeAVX2NonTmp(result, src)
-			} else {
-				encodeAVX2(result, src)
-			}
 		case sse2:
 			cpuStr = "sse2"
-			if nonTmp {
-				encodeSSE2NonTmp(result, src)
-			} else {
-				encodeSSE2(result, src)
-			}
 		}
-
+		encode(result, src, cpuFeature)
 		if !bytes.Equal(expect, result) {
 			t.Fatalf("encode mismatch; size: %d; ext: %s", size, cpuStr)
 		}

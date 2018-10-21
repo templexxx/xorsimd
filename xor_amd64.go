@@ -1,16 +1,13 @@
 package xor
 
-import "github.com/templexxx/cpu"
-
-func encode(dst []byte, src [][]byte) {
+func encode(dst []byte, src [][]byte, feature int) {
 
 	var nonTmp bool
 	if len(dst) > nonTmpSize {
 		nonTmp = true
 	}
 
-	feat := getCPUFeature()
-	switch feat {
+	switch feature {
 	case avx512:
 		if nonTmp {
 			encodeAVX512NonTmp(dst, src)
@@ -33,15 +30,7 @@ func encode(dst []byte, src [][]byte) {
 	return
 }
 
-func getCPUFeature() int {
-	if useAVX512() {
-		return avx512
-	} else if cpu.X86.HasAVX2 {
-		return avx2
-	}  else {
-		return sse2	// amd64 must has sse2
-	}
-}
+
 
 
 //go:noescape
