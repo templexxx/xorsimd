@@ -2,8 +2,9 @@ package xor
 
 import (
 	"bytes"
+	crand "crypto/rand"
 	"fmt"
-	"math/rand"
+	"io"
 	"testing"
 
 	"github.com/templexxx/cpu"
@@ -26,7 +27,7 @@ func TestVerifyEncode(t *testing.T) {
 	if cpu.X86.HasAVX2 {
 		verifyEncode(t, testDataCnt, avx2)
 		verifyEncode(t, testDataCnt, sse2)
-	} else  {
+	} else {
 		verifyEncode(t, testDataCnt, sse2)
 	}
 }
@@ -38,8 +39,10 @@ func verifyEncode(t *testing.T, dataCnt int, cpuFeature int) {
 		src := make([][]byte, dataCnt)
 		for j := 0; j < dataCnt; j++ {
 			src[j] = make([]byte, size)
-			rand.Seed(int64(j))
-			rand.Read(src[j])
+			err := fillRandom(src[j])
+			if err != nil {
+				t.Fatal(err)
+			}
 		}
 		for j := 0; j < size; j++ {
 			expect[j] = src[0][j] ^ src[1][j]
@@ -66,6 +69,40 @@ func verifyEncode(t *testing.T, dataCnt int, cpuFeature int) {
 	}
 }
 
+func TestVerifyUpdate(t *testing.T) {
+	verifyUpdate(t, testDataCnt)
+}
+
+func verifyUpdate(t *testing.T, dataCnt int) {
+	for size := 1; size <= verifySize; size++ {
+		expect := make([]byte, size)
+		result := make([]byte, size)
+		src0 := make([][]byte, dataCnt)
+		src1 := make([][]byte, dataCnt)
+		for j := 0; j < dataCnt; j++ {
+			src0[j] = make([]byte, size)
+			err := fillRandom(src0[j])
+			if err != nil {
+				t.Fatal(err)
+			}
+			src1[j] = make([]byte, size)
+			copy(src1[j], src0[j])
+		}
+		Encode(result, src0)
+		newData := make([]byte, size)
+		err := fillRandom(newData)
+		if err != nil {
+			t.Fatal(err)
+		}
+		Update(src0[0], newData, result)
+		src1[0] = newData
+		Encode(expect, src1)
+		if !bytes.Equal(expect, result) {
+			t.Fatal("update mismatch")
+		}
+	}
+}
+
 func BenchmarkEncode(b *testing.B) {
 	sizes := []int{4 * kb, 64 * kb}
 	b.Run("", benchEncRun(benchEnc, 5, sizes))
@@ -86,8 +123,10 @@ func benchEnc(b *testing.B, dataCnt, size int) {
 	data := make([][]byte, dataCnt)
 	for i := 0; i < dataCnt; i++ {
 		data[i] = make([]byte, size)
-		rand.Seed(int64(i))
-		rand.Read(data[i])
+		err := fillRandom(data[i])
+		if err != nil {
+			b.Fatal(err)
+		}
 	}
 	Encode(parity, data)
 	b.SetBytes(int64(dataCnt * size))
@@ -97,3 +136,7 @@ func benchEnc(b *testing.B, dataCnt, size int) {
 	}
 }
 
+func fillRandom(p []byte) (err error) {
+	_, err = io.ReadFull(crand.Reader, p)
+	return
+}

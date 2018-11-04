@@ -68,4 +68,9 @@ func useAVX512() (ok bool) {
 // if size > nonTmpSize, it will use Non-Temporal Hint store
 const nonTmpSize = 8 * 1024 // depends on CPU Cache Size
 
-
+// Update parity when one data vect change
+func Update(oldData, newData, parity []byte) {
+	tmpVects := make([][]byte, 3)
+	tmpVects[0], tmpVects[1], tmpVects[2] = oldData, newData, parity
+	Encode(parity, tmpVects)
+}
