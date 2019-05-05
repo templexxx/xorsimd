@@ -2,6 +2,9 @@ package xor
 
 import "github.com/templexxx/cpu"
 
+// AVX512 may slow down CPU Clock (maybe not).
+// TODO need more research:
+// https://lemire.me/blog/2018/04/19/by-how-much-does-avx-512-slow-down-your-cpu-a-first-experiment/
 var EnableAVX512 = false
 
 // Encode encodes elements from source slice into a
@@ -41,8 +44,8 @@ func getCPUFeature() int {
 		return avx512
 	} else if cpu.X86.HasAVX2 {
 		return avx2
-	}  else {
-		return sse2	// amd64 must has sse2
+	} else {
+		return sse2 // amd64 must has sse2
 	}
 }
 
