@@ -1,5 +1,10 @@
 # xor
 
+[![Build Status][1]][2]
+
+[1]: https://travis-ci.org/templexxx/xorsimd.svg?branch=master
+[2]: https://travis-ci.org/templexxx/xorsimd
+
 XOR code engine in pure Go
 
 more than 200GB/S per core
