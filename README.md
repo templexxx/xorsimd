@@ -1,10 +1,5 @@
 # xor
 
-[![Build Status][1]][2]
-
-[1]: https://travis-ci.org/templexxx/xorsimd.svg?branch=master
-[2]: https://travis-ci.org/templexxx/xorsimd
-
 XOR code engine in pure Go
 
 more than 200GB/S per core
@@ -12,13 +7,6 @@ more than 200GB/S per core
 ## Introduction:
 
 1. Use SIMD (SSE2 or AVX2 or AVX512) for speeding up
-2. Go1.11
-
-## Installation
-To get the package use the standard:
-```bash
-go get github.com/templexxx/xorsimd
-```
 
 ## Documentation
 
