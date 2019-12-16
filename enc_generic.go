@@ -4,7 +4,7 @@
 
 // +build !amd64
 
-package xor
+package xorsimd
 
 import (
 	"runtime"
