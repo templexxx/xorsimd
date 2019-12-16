@@ -18,7 +18,7 @@
 >- XOR code engine in pure Go.
 >
 >- [High Performance](https://github.com/templexxx/xorsimd#performance): 
-More than 200GB/s per physics core. 
+More than 270GB/s per physics core. 
 
 ## Performance
 
@@ -36,11 +36,11 @@ Performance depends mainly on:
 
 `I/O = (src_num + 1) * vector_size / cost`
 
-| Src Num  | Vector size | AVX512 I/O (MB/S) |  AVX2 I/O (MB/S) |SSE2 I/O (MB/S) |Generic I/O (MB/S) |
-|-------|-------------|-------------|---------------|---------------|---------------|
-|5|4KB|         |         |        |       |
-|5|1MB|         |    	      |          |        |
-|5|8MB|          |          |        |        |
-|10|4KB|         |         |          |        |
-|10|1MB|        |        |        |       |
-|10|8MB|         |           |          |       |
+| Src Num  | Vector size | AVX512 I/O (MB/S) |  AVX2 I/O (MB/S) |SSE2 I/O (MB/S) |
+|-------|-------------|-------------|---------------|---------------|
+|5|4KB|     270403.73    |     142825.25    |    74443.91    |
+|5|1MB|    26948.34     |   26887.37 	      |     26950.65     | 
+|5|8MB|     17881.32     |    17212.56      |  16402.97      | 
+|10|4KB|     190445.30    |   102953.59      |   53244.04       |  
+|10|1MB|   26424.44     |     26618.65   |    26094.39    |   
+|10|8MB|   15471.31      |     14866.72      |    13565.80      |  
