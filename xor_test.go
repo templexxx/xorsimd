@@ -147,15 +147,15 @@ func benchEncRun(f func(*testing.B, int, int, int), srcNums, sizes, feats []int)
 	}
 }
 
-func benchEnc(b *testing.B, dataNum, size, feat int) {
+func benchEnc(b *testing.B, srcNum, size, feat int) {
 	dst := make([]byte, size)
-	src := make([][]byte, dataNum)
-	for i := 0; i < dataNum; i++ {
+	src := make([][]byte, srcNum)
+	for i := 0; i < srcNum; i++ {
 		src[i] = make([]byte, size)
 		fillRandom(src[i])
 	}
 
-	b.SetBytes(int64(dataNum * size))
+	b.SetBytes(int64((srcNum + 1) * size))
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		encode(dst, src, feat)
