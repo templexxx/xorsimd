@@ -22,7 +22,7 @@ const (
 	testSize = kb
 )
 
-func TestRS_Encode(t *testing.T) {
+func TestEncode(t *testing.T) {
 	max := testSize
 
 	switch getCPUFeature() {
