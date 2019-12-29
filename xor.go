@@ -1,9 +1,7 @@
-/*
- * Copyright (c) 2019. Temple3x (temple3x@gmail.com)
- *
- * Use of this source code is governed by the MIT License
- * that can be found in the LICENSE file.
- */
+// Copyright (c) 2019. Temple3x (temple3x@gmail.com)
+//
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
 
 package xorsimd
 
@@ -43,6 +41,14 @@ func Encode(dst []byte, src [][]byte) (n int) {
 	f := getCPUFeature()
 	encode(dst, src, f)
 	return
+}
+
+// EncodeBytes encodes the bytes in a and b into a
+// destination slice. The source and destination may overlap.
+// EncodeBytes returns the number of elements encoded, which will be the minimum of
+// len(dst), len(a), len(b).
+func EncodeBytes(dst, a, b []byte) int {
+	return Encode(dst, [][]byte{a, b})
 }
 
 const (

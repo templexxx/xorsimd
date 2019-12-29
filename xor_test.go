@@ -1,9 +1,14 @@
-/*
- * Copyright (c) 2019. Temple3x (temple3x@gmail.com)
- *
- * Use of this source code is governed by the MIT License
- * that can be found in the LICENSE file.
- */
+// Copyright (c) 2019. Temple3x (temple3x@gmail.com)
+//
+// Use of this source code is governed by the MIT License
+// that can be found in the LICENSE file.
+//
+// Copyright 2013 The Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+//
+// TestEncodeBytes is copied from Go Standard lib:
+// crypto/cipher/xor_test.go
 
 package xorsimd
 
@@ -22,7 +27,49 @@ const (
 	testSize = kb
 )
 
-func TestEncode(t *testing.T) {
+func TestEncodeBytes(t *testing.T) {
+
+	rand.Seed(time.Now().UnixNano())
+
+	for j := 1; j <= 1024; j++ {
+
+		for alignP := 0; alignP < 2; alignP++ {
+			for alignQ := 0; alignQ < 2; alignQ++ {
+				for alignD := 0; alignD < 2; alignD++ {
+					p := make([]byte, j)[alignP:]
+					q := make([]byte, j)[alignQ:]
+					d1 := make([]byte, j)[alignD:]
+					d2 := make([]byte, j)[alignD:]
+
+					fillRandom(p)
+					fillRandom(q)
+
+					EncodeBytes(d1, p, q)
+					n := min(p, q, d1)
+					for i := 0; i < n; i++ {
+						d2[i] = p[i] ^ q[i]
+					}
+					if !bytes.Equal(d1, d2) {
+						t.Fatal("not equal")
+					}
+				}
+			}
+		}
+	}
+}
+
+func min(a, b, c []byte) int {
+	n := len(a)
+	if len(b) < n {
+		n = len(b)
+	}
+	if len(c) < n {
+		n = len(c)
+	}
+	return n
+}
+
+func TestEncodeWithFeature(t *testing.T) {
 	max := testSize
 
 	switch getCPUFeature() {
