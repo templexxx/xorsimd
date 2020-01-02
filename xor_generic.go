@@ -19,30 +19,6 @@ import (
 const wordSize = int(unsafe.Sizeof(uintptr(0)))
 const supportsUnaligned = runtime.GOARCH == "386" || runtime.GOARCH == "ppc64" || runtime.GOARCH == "ppc64le" || runtime.GOARCH == "s390x"
 
-func encodeW(dst, a, b []byte) {
-	encWords(dst, a, b)
-}
-
-func encodeDW(dst, a, b []byte) {
-	encWords(dst, a, b)
-}
-
-func encWords(dst, a, b []byte) {
-	if supportsUnaligned {
-		dw := *(*[]uintptr)(unsafe.Pointer(&dst))
-		aw := *(*[]uintptr)(unsafe.Pointer(&a))
-		bw := *(*[]uintptr)(unsafe.Pointer(&b))
-		n := len(b) / wordSize
-		for i := 0; i < n; i++ {
-			dw[i] = aw[i] ^ bw[i]
-		}
-	} else {
-		for i := 0; i < len(dst); i++ {
-			dst[i] = a[i] ^ b[i]
-		}
-	}
-}
-
 func encode(dst []byte, src [][]byte) {
 	if supportsUnaligned {
 		fastEncode(dst, src, len(dst))
@@ -105,4 +81,53 @@ func safeEncode(dst []byte, src [][]byte, n int) {
 		}
 		dst[i] = s
 	}
+}
+
+// Bytes8 XORs of word (8 Bytes).
+// The slice arguments a, b, dst's lengths are assumed to be at least 8,
+// if not, Bytes8 will panic.
+func Bytes8(dst, a, b []byte) {
+
+	xorWords(dst, a, b)
+}
+
+// Bytes16 XORs of packed doubleword (16 Bytes).
+// The slice arguments a, b, dst's lengths are assumed to be at least 16,
+// if not, Bytes16 will panic.
+func Bytes16(dst, a, b []byte) {
+
+	xorWords(dst, a, b)
+}
+
+// xorWords XORs multiples of 4 or 8 bytes (depending on architecture.)
+// The slice arguments a and b are assumed to be of equal length.
+func xorWords(dst, a, b []byte) {
+	if supportsUnaligned {
+		dw := *(*[]uintptr)(unsafe.Pointer(&dst))
+		aw := *(*[]uintptr)(unsafe.Pointer(&a))
+		bw := *(*[]uintptr)(unsafe.Pointer(&b))
+		n := len(b) / wordSize
+		for i := 0; i < n; i++ {
+			dw[i] = aw[i] ^ bw[i]
+		}
+	} else {
+		n := len(b)
+		for i := 0; i < n; i++ {
+			dst[i] = a[i] ^ b[i]
+		}
+	}
+}
+
+// BytesU XORs the bytes in a and b into a
+// destination slice. The source and destination may overlap.
+//
+// BytesU returns the number of bytes encoded, which will be the minimum of
+// len(dst), len(a), len(b).
+//
+// It's used for encoding small bytes slices (< dozens bytes),
+// and the slices may not be aligned to 8 bytes or 16 bytes.
+// If the length is big, use 'func Bytes(dst, a, b []byte)' instead.
+func BytesU(dst, a, b []byte) int {
+
+	return Bytes(dst, a, b)
 }

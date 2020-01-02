@@ -27,7 +27,7 @@ const (
 	testSize = kb
 )
 
-func TestEncodeW(t *testing.T) {
+func TestBytes8(t *testing.T) {
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -38,7 +38,7 @@ func TestEncodeW(t *testing.T) {
 		fillRandom(b)
 
 		dst0 := make([]byte, 8)
-		EncodeW(dst0, a, b)
+		Bytes8(dst0, a, b)
 
 		dst1 := make([]byte, 8)
 		for i := 0; i < 8; i++ {
@@ -51,7 +51,7 @@ func TestEncodeW(t *testing.T) {
 	}
 }
 
-func TestEncodeDW(t *testing.T) {
+func TestBytes16(t *testing.T) {
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -62,7 +62,7 @@ func TestEncodeDW(t *testing.T) {
 		fillRandom(b)
 
 		dst0 := make([]byte, 16)
-		EncodeDW(dst0, a, b)
+		Bytes16(dst0, a, b)
 
 		dst1 := make([]byte, 16)
 		for i := 0; i < 16; i++ {
@@ -75,7 +75,7 @@ func TestEncodeDW(t *testing.T) {
 	}
 }
 
-func TestEncodeBytes(t *testing.T) {
+func TestBytes(t *testing.T) {
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -92,7 +92,38 @@ func TestEncodeBytes(t *testing.T) {
 					fillRandom(p)
 					fillRandom(q)
 
-					EncodeBytes(d1, p, q)
+					Bytes(d1, p, q)
+					n := min(p, q, d1)
+					for i := 0; i < n; i++ {
+						d2[i] = p[i] ^ q[i]
+					}
+					if !bytes.Equal(d1, d2) {
+						t.Fatal("not equal")
+					}
+				}
+			}
+		}
+	}
+}
+
+func TestBytesU(t *testing.T) {
+
+	rand.Seed(time.Now().UnixNano())
+
+	for j := 1; j <= 1024; j++ {
+
+		for alignP := 0; alignP < 2; alignP++ {
+			for alignQ := 0; alignQ < 2; alignQ++ {
+				for alignD := 0; alignD < 2; alignD++ {
+					p := make([]byte, j)[alignP:]
+					q := make([]byte, j)[alignQ:]
+					d1 := make([]byte, j)[alignD:]
+					d2 := make([]byte, j)[alignD:]
+
+					fillRandom(p)
+					fillRandom(q)
+
+					BytesU(d1, p, q)
 					n := min(p, q, d1)
 					for i := 0; i < n; i++ {
 						d2[i] = p[i] ^ q[i]
@@ -207,7 +238,7 @@ func randIntn(n, min int) int {
 	return m
 }
 
-func BenchmarkEncodeW(b *testing.B) {
+func BenchmarkBytes8(b *testing.B) {
 	s0 := make([]byte, 8)
 	s1 := make([]byte, 8)
 	fillRandom(s0)
@@ -217,11 +248,11 @@ func BenchmarkEncodeW(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(8)
 	for i := 0; i < b.N; i++ {
-		EncodeW(dst0, s0, s1)
+		Bytes8(dst0, s0, s1)
 	}
 }
 
-func BenchmarkEncodeDW(b *testing.B) {
+func BenchmarkBytes16(b *testing.B) {
 	s0 := make([]byte, 16)
 	s1 := make([]byte, 16)
 	fillRandom(s0)
@@ -231,7 +262,7 @@ func BenchmarkEncodeDW(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(16)
 	for i := 0; i < b.N; i++ {
-		EncodeDW(dst0, s0, s1)
+		Bytes16(dst0, s0, s1)
 	}
 }
 
