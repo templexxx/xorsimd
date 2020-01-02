@@ -12,6 +12,9 @@ import "github.com/templexxx/cpu"
 // https://lemire.me/blog/2018/04/19/by-how-much-does-avx-512-slow-down-your-cpu-a-first-experiment/
 var EnableAVX512 = true
 
+// cpuFeature indicates which instruction set will be used.
+var cpuFeature = getCPUFeature()
+
 // Encode encodes elements from source slice into a
 // destination slice. The source and destination may overlap.
 // Encode returns the number of elements encoded, which will be the minimum of
@@ -38,8 +41,7 @@ func Encode(dst []byte, src [][]byte) (n int) {
 		return
 	}
 
-	f := getCPUFeature()
-	encode(dst, src, f)
+	encode(dst, src)
 	return
 }
 

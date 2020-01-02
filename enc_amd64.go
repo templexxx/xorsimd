@@ -7,9 +7,9 @@ package xorsimd
 
 import "unsafe"
 
-func encode(dst []byte, src [][]byte, feature int) {
+func encode(dst []byte, src [][]byte) {
 
-	switch feature {
+	switch cpuFeature {
 	case avx512:
 		encodeAVX512(dst, src)
 	case avx2:

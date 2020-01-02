@@ -43,7 +43,7 @@ func encWords(dst, a, b []byte) {
 	}
 }
 
-func encode(dst []byte, src [][]byte, feature int) {
+func encode(dst []byte, src [][]byte) {
 	if supportsUnaligned {
 		fastEncode(dst, src, len(dst))
 	} else {

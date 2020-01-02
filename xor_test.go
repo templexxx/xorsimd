@@ -152,11 +152,13 @@ func testEncode(t *testing.T, maxSize, feat, cmpFeat int) {
 		if cmpFeat < 0 {
 			encodeTested(exp, src)
 		} else {
-			encode(exp, src, cmpFeat)
+			cpuFeature = cmpFeat
+			Encode(exp, src)
 		}
 
 		act := make([]byte, size)
-		encode(act, src, feat)
+		cpuFeature = feat
+		Encode(act, src)
 
 		if !bytes.Equal(exp, act) {
 			t.Fatalf("%s mismatched with %s, src_num: %d, size: %d",
@@ -277,11 +279,12 @@ func benchEnc(b *testing.B, srcNum, size, feat int) {
 		src[i] = make([]byte, size)
 		fillRandom(src[i])
 	}
+	cpuFeature = feat
 
 	b.SetBytes(int64((srcNum + 1) * size))
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		encode(dst, src, feat)
+		encode(dst, src)
 	}
 }
 
