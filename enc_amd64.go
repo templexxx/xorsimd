@@ -5,6 +5,8 @@
 
 package xorsimd
 
+import "unsafe"
+
 func encode(dst []byte, src [][]byte, feature int) {
 
 	switch feature {
@@ -16,6 +18,23 @@ func encode(dst []byte, src [][]byte, feature int) {
 		encodeSSE2(dst, src)
 	}
 	return
+}
+
+func encodeW(dst, a, b []byte) {
+	dw := *(*[]uintptr)(unsafe.Pointer(&dst))
+	aw := *(*[]uintptr)(unsafe.Pointer(&a))
+	bw := *(*[]uintptr)(unsafe.Pointer(&b))
+
+	dw[0] = aw[0] ^ bw[0]
+}
+
+func encodeDW(dst, a, b []byte) {
+	dw := *(*[]uintptr)(unsafe.Pointer(&dst))
+	aw := *(*[]uintptr)(unsafe.Pointer(&a))
+	bw := *(*[]uintptr)(unsafe.Pointer(&b))
+
+	dw[0] = aw[0] ^ bw[0]
+	dw[1] = aw[1] ^ bw[1]
 }
 
 //go:noescape

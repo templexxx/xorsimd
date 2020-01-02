@@ -51,6 +51,30 @@ func EncodeBytes(dst, a, b []byte) int {
 	return Encode(dst, [][]byte{a, b})
 }
 
+// EncodeW XORs of word (8 Bytes).
+// The slice arguments a, b, dst's lengths are assumed to be at least 8,
+// if not, will panic.
+func EncodeW(dst, a, b []byte) {
+	_ = dst[7]
+	_ = a[7]
+	_ = b[7]
+
+	encodeW(dst, a, b)
+}
+
+// EncodeDW XORs of packed doubleword (16 Bytes).
+// The slice arguments a, b, dst's lengths are assumed to be at least 16,
+// if not, it will panic.
+//
+// This functions could be used for AES encryption, AES block size is 16 bytes in Go.
+func EncodeDW(dst, a, b []byte) {
+	_ = dst[15]
+	_ = a[15]
+	_ = b[15]
+
+	encodeDW(dst, a, b)
+}
+
 const (
 	avx512 = iota
 	avx2
