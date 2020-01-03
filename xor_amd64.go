@@ -18,7 +18,7 @@ func encode(dst []byte, src [][]byte) {
 	return
 }
 
-// Bytes8 XORs of word (8 Bytes).
+// Bytes8 XORs of 8 Bytes.
 // The slice arguments a, b, dst's lengths are assumed to be at least 8,
 // if not, Bytes8 will panic.
 func Bytes8(dst, a, b []byte) {
@@ -26,10 +26,26 @@ func Bytes8(dst, a, b []byte) {
 	bytes8(&dst[0], &a[0], &b[0])
 }
 
-// Bytes16 XORs of packed doubleword (16 Bytes).
+// Bytes16 XORs of packed 16 Bytes.
 // The slice arguments a, b, dst's lengths are assumed to be at least 16,
 // if not, Bytes16 will panic.
 func Bytes16(dst, a, b []byte) {
+
+	bytes16(&dst[0], &a[0], &b[0])
+}
+
+// Bytes8Align XORs of 8 Bytes.
+// The slice arguments a, b, dst's lengths are assumed to be at least 8,
+// if not, Bytes8 will panic.
+func Bytes8Align(dst, a, b []byte) {
+
+	bytes8(&dst[0], &a[0], &b[0])
+}
+
+// Bytes16Align XORs of packed 16 Bytes.
+// The slice arguments a, b, dst's lengths are assumed to be at least 16,
+// if not, Bytes16 will panic.
+func Bytes16Align(dst, a, b []byte) {
 
 	bytes16(&dst[0], &a[0], &b[0])
 }

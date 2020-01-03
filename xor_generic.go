@@ -83,7 +83,7 @@ func safeEncode(dst []byte, src [][]byte, n int) {
 	}
 }
 
-// Bytes8 XORs of word (8 Bytes).
+// Bytes8 XORs of word 8 Bytes.
 // The slice arguments a, b, dst's lengths are assumed to be at least 8,
 // if not, Bytes8 will panic.
 func Bytes8(dst, a, b []byte) {
@@ -91,7 +91,7 @@ func Bytes8(dst, a, b []byte) {
 	bytesWords(dst[:8], a[:8], b[:8])
 }
 
-// Bytes16 XORs of packed doubleword (16 Bytes).
+// Bytes16 XORs of packed doubleword 16 Bytes.
 // The slice arguments a, b, dst's lengths are assumed to be at least 16,
 // if not, Bytes16 will panic.
 func Bytes16(dst, a, b []byte) {
@@ -115,6 +115,40 @@ func bytesWords(dst, a, b []byte) {
 		for i := 0; i < n; i++ {
 			dst[i] = a[i] ^ b[i]
 		}
+	}
+}
+
+// Bytes8Align XORs of 8 Bytes.
+// The slice arguments a, b, dst's lengths are assumed to be at least 8,
+// if not, Bytes8 will panic.
+//
+// All the byte slices must be aligned to wordsize.
+func Bytes8Align(dst, a, b []byte) {
+
+	bytesWordsAlign(dst[:8], a[:8], b[:8])
+}
+
+// Bytes16Align XORs of packed 16 Bytes.
+// The slice arguments a, b, dst's lengths are assumed to be at least 16,
+// if not, Bytes16 will panic.
+//
+// All the byte slices must be aligned to wordsize.
+func Bytes16Align(dst, a, b []byte) {
+
+	bytesWordsAlign(dst[:16], a[:16], b[:16])
+}
+
+// bytesWordsAlign XORs multiples of 4 or 8 bytes (depending on architecture.)
+// The slice arguments a and b are assumed to be of equal length.
+//
+// All the byte slices must be aligned to wordsize.
+func bytesWordsAlign(dst, a, b []byte) {
+	dw := *(*[]uintptr)(unsafe.Pointer(&dst))
+	aw := *(*[]uintptr)(unsafe.Pointer(&a))
+	bw := *(*[]uintptr)(unsafe.Pointer(&b))
+	n := len(b) / wordSize
+	for i := 0; i < n; i++ {
+		dw[i] = aw[i] ^ bw[i]
 	}
 }
 

@@ -18,6 +18,7 @@ import (
 	"math/rand"
 	"testing"
 	"time"
+	"unsafe"
 )
 
 const (
@@ -71,6 +72,118 @@ func TestBytes16(t *testing.T) {
 
 		if !bytes.Equal(dst0, dst1) {
 			t.Fatal("not equal", dst0, dst1, a, b)
+		}
+	}
+}
+
+const wordSize = int(unsafe.Sizeof(uintptr(0)))
+
+func TestBytes8Align(t *testing.T) {
+
+	rand.Seed(time.Now().UnixNano())
+
+	for j := 0; j < 1024; j++ {
+		a := make([]byte, 8+wordSize)
+		b := make([]byte, 8+wordSize)
+		dst0 := make([]byte, 8+wordSize)
+		dst1 := make([]byte, 8+wordSize)
+
+		al := alignment(a)
+		offset := 0
+		if al != 0 {
+			offset = wordSize - al
+		}
+		a = a[offset : offset+8]
+
+		al = alignment(b)
+		offset = 0
+		if al != 0 {
+			offset = wordSize - al
+		}
+		b = b[offset : offset+8]
+
+		al = alignment(dst0)
+		offset = 0
+		if al != 0 {
+			offset = wordSize - al
+		}
+		dst0 = dst0[offset : offset+8]
+
+		al = alignment(dst1)
+		offset = 0
+		if al != 0 {
+			offset = wordSize - al
+		}
+		dst1 = dst1[offset : offset+8]
+
+		fillRandom(a)
+		fillRandom(b)
+
+		Bytes8Align(dst0, a, b)
+
+		for i := 0; i < 8; i++ {
+			dst1[i] = a[i] ^ b[i]
+		}
+
+		if !bytes.Equal(dst0, dst1) {
+			t.Fatal("not equal", a, b, dst0, dst1)
+		}
+	}
+}
+
+func alignment(s []byte) int {
+	return int(uintptr(unsafe.Pointer(&s[0])) & uintptr(wordSize-1))
+}
+
+func TestBytes16Align(t *testing.T) {
+
+	rand.Seed(time.Now().UnixNano())
+
+	for j := 0; j < 1024; j++ {
+		a := make([]byte, 16+wordSize)
+		b := make([]byte, 16+wordSize)
+		dst0 := make([]byte, 16+wordSize)
+		dst1 := make([]byte, 16+wordSize)
+
+		al := alignment(a)
+		offset := 0
+		if al != 0 {
+			offset = wordSize - al
+		}
+		a = a[offset : offset+16]
+
+		al = alignment(b)
+		offset = 0
+		if al != 0 {
+			offset = wordSize - al
+		}
+		b = b[offset : offset+16]
+
+		al = alignment(dst0)
+		offset = 0
+		if al != 0 {
+			offset = wordSize - al
+		}
+		dst0 = dst0[offset : offset+16]
+
+		al = alignment(dst1)
+		offset = 0
+		if al != 0 {
+			offset = wordSize - al
+		}
+		dst1 = dst1[offset : offset+16]
+
+		fillRandom(a)
+		fillRandom(b)
+
+		Bytes16Align(dst0, a, b)
+
+		for i := 0; i < 16; i++ {
+			dst1[i] = a[i] ^ b[i]
+		}
+
+		if !bytes.Equal(dst0, dst1) {
+			t.Fatal("not equal", a, b, dst0, dst1)
 		}
 	}
 }
