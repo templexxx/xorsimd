@@ -88,7 +88,7 @@ func safeEncode(dst []byte, src [][]byte, n int) {
 // if not, Bytes8 will panic.
 func Bytes8(dst, a, b []byte) {
 
-	xorWords(dst, a, b)
+	bytesWords(dst[:8], a[:8], b[:8])
 }
 
 // Bytes16 XORs of packed doubleword (16 Bytes).
@@ -96,12 +96,12 @@ func Bytes8(dst, a, b []byte) {
 // if not, Bytes16 will panic.
 func Bytes16(dst, a, b []byte) {
 
-	xorWords(dst, a, b)
+	bytesWords(dst[:16], a[:16], b[:16])
 }
 
-// xorWords XORs multiples of 4 or 8 bytes (depending on architecture.)
+// bytesWords XORs multiples of 4 or 8 bytes (depending on architecture.)
 // The slice arguments a and b are assumed to be of equal length.
-func xorWords(dst, a, b []byte) {
+func bytesWords(dst, a, b []byte) {
 	if supportsUnaligned {
 		dw := *(*[]uintptr)(unsafe.Pointer(&dst))
 		aw := *(*[]uintptr)(unsafe.Pointer(&a))
@@ -118,16 +118,54 @@ func xorWords(dst, a, b []byte) {
 	}
 }
 
-// BytesU XORs the bytes in a and b into a
-// destination slice. The source and destination may overlap.
-//
-// BytesU returns the number of bytes encoded, which will be the minimum of
-// len(dst), len(a), len(b).
+// BytesA XORs the len(a) bytes in a and b into a
+// destination slice.
+// The destination should have enough space.
 //
 // It's used for encoding small bytes slices (< dozens bytes),
 // and the slices may not be aligned to 8 bytes or 16 bytes.
-// If the length is big, use 'func Bytes(dst, a, b []byte)' instead.
-func BytesU(dst, a, b []byte) int {
+// If the length is big, it's better to use 'func Bytes(dst, a, b []byte)' instead
+// for gain better performance.
+func BytesA(dst, a, b []byte) {
 
-	return Bytes(dst, a, b)
+	n := len(a)
+	bytesN(dst[:n], a[:n], b[:n], n)
+}
+
+// BytesB XORs the len(b) bytes in a and b into a
+// destination slice.
+// The destination should have enough space.
+//
+// It's used for encoding small bytes slices (< dozens bytes),
+// and the slices may not be aligned to 8 bytes or 16 bytes.
+// If the length is big, it's better to use 'func Bytes(dst, a, b []byte)' instead
+// for gain better performance.
+func BytesB(dst, a, b []byte) {
+
+	n := len(b)
+	bytesN(dst[:n], a[:n], b[:n], n)
+}
+
+func bytesN(dst, a, b []byte, n int) {
+
+	switch {
+	case supportsUnaligned:
+		w := n / wordSize
+		if w > 0 {
+			dw := *(*[]uintptr)(unsafe.Pointer(&dst))
+			aw := *(*[]uintptr)(unsafe.Pointer(&a))
+			bw := *(*[]uintptr)(unsafe.Pointer(&b))
+			for i := 0; i < w; i++ {
+				dw[i] = aw[i] ^ bw[i]
+			}
+		}
+
+		for i := (n - n%wordSize); i < n; i++ {
+			dst[i] = a[i] ^ b[i]
+		}
+	default:
+		for i := 0; i < n; i++ {
+			dst[i] = a[i] ^ b[i]
+		}
+	}
 }

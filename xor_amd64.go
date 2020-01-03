@@ -34,25 +34,30 @@ func Bytes16(dst, a, b []byte) {
 	bytes16(&dst[0], &a[0], &b[0])
 }
 
-// BytesU XORs the bytes in a and b into a
-// destination slice. The source and destination may overlap.
-//
-// BytesU returns the number of bytes encoded, which will be the minimum of
-// len(dst), len(a), len(b).
+// BytesA XORs the len(a) bytes in a and b into a
+// destination slice.
+// The destination should have enough space.
 //
 // It's used for encoding small bytes slices (< dozens bytes),
 // and the slices may not be aligned to 8 bytes or 16 bytes.
-// If the length is big, use 'func Bytes(dst, a, b []byte)' instead.
-func BytesU(dst, a, b []byte) int {
+// If the length is big, it's better to use 'func Bytes(dst, a, b []byte)' instead
+// for gain better performance.
+func BytesA(dst, a, b []byte) {
 
-	n := checkLen(dst, [][]byte{a, b})
+	bytesN(&dst[0], &a[0], &b[0], len(a))
+}
 
-	if n == 0 {
-		return 0
-	}
+// BytesB XORs the len(b) bytes in a and b into a
+// destination slice.
+// The destination should have enough space.
+//
+// It's used for encoding small bytes slices (< dozens bytes),
+// and the slices may not be aligned to 8 bytes or 16 bytes.
+// If the length is big, it's better to use 'func Bytes(dst, a, b []byte)' instead
+// for gain better performance.
+func BytesB(dst, a, b []byte) {
 
-	bytesN(&dst[0], &a[0], &b[0], n)
-	return n
+	bytesN(&dst[0], &a[0], &b[0], len(b))
 }
 
 //go:noescape

@@ -75,6 +75,58 @@ func TestBytes16(t *testing.T) {
 	}
 }
 
+func TestBytesA(t *testing.T) {
+
+	rand.Seed(time.Now().UnixNano())
+
+	for j := 2; j <= 1024; j++ {
+
+		for alignP := 0; alignP < 2; alignP++ {
+			p := make([]byte, j)[alignP:]
+			q := make([]byte, j)
+			d1 := make([]byte, j)
+			d2 := make([]byte, j)
+
+			fillRandom(p)
+			fillRandom(q)
+
+			BytesA(d1, p, q)
+			for i := 0; i < j-alignP; i++ {
+				d2[i] = p[i] ^ q[i]
+			}
+			if !bytes.Equal(d1, d2) {
+				t.Fatal("not equal")
+			}
+		}
+	}
+}
+
+func TestBytesB(t *testing.T) {
+
+	rand.Seed(time.Now().UnixNano())
+
+	for j := 2; j <= 1024; j++ {
+
+		for alignQ := 0; alignQ < 2; alignQ++ {
+			p := make([]byte, j)
+			q := make([]byte, j)[alignQ:]
+			d1 := make([]byte, j)
+			d2 := make([]byte, j)
+
+			fillRandom(p)
+			fillRandom(q)
+
+			BytesB(d1, p, q)
+			for i := 0; i < j-alignQ; i++ {
+				d2[i] = p[i] ^ q[i]
+			}
+			if !bytes.Equal(d1, d2) {
+				t.Fatal("not equal")
+			}
+		}
+	}
+}
+
 func TestBytes(t *testing.T) {
 
 	rand.Seed(time.Now().UnixNano())
@@ -93,37 +145,6 @@ func TestBytes(t *testing.T) {
 					fillRandom(q)
 
 					Bytes(d1, p, q)
-					n := min(p, q, d1)
-					for i := 0; i < n; i++ {
-						d2[i] = p[i] ^ q[i]
-					}
-					if !bytes.Equal(d1, d2) {
-						t.Fatal("not equal")
-					}
-				}
-			}
-		}
-	}
-}
-
-func TestBytesU(t *testing.T) {
-
-	rand.Seed(time.Now().UnixNano())
-
-	for j := 1; j <= 1024; j++ {
-
-		for alignP := 0; alignP < 2; alignP++ {
-			for alignQ := 0; alignQ < 2; alignQ++ {
-				for alignD := 0; alignD < 2; alignD++ {
-					p := make([]byte, j)[alignP:]
-					q := make([]byte, j)[alignQ:]
-					d1 := make([]byte, j)[alignD:]
-					d2 := make([]byte, j)[alignD:]
-
-					fillRandom(p)
-					fillRandom(q)
-
-					BytesU(d1, p, q)
 					n := min(p, q, d1)
 					for i := 0; i < n; i++ {
 						d2[i] = p[i] ^ q[i]
@@ -263,6 +284,20 @@ func BenchmarkBytes16(b *testing.B) {
 	b.SetBytes(16)
 	for i := 0; i < b.N; i++ {
 		Bytes16(dst0, s0, s1)
+	}
+}
+
+func BenchmarkBytesN_16Bytes(b *testing.B) {
+	s0 := make([]byte, 16)
+	s1 := make([]byte, 16)
+	fillRandom(s0)
+	fillRandom(s1)
+	dst0 := make([]byte, 16)
+
+	b.ResetTimer()
+	b.SetBytes(16)
+	for i := 0; i < b.N; i++ {
+		BytesA(dst0, s0, s1)
 	}
 }
 
