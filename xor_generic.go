@@ -203,3 +203,13 @@ func bytesN(dst, a, b []byte, n int) {
 		}
 	}
 }
+
+func xorBytes(dst, a, b []byte, n int) {
+	for i := 0; i < n; i += 16 {
+		xor16Bytes(dst[i:i+16], a[i:i+16], b[i:i+16])
+	}
+}
+
+func xor16Bytes(dst, a, b []byte) {
+
+}

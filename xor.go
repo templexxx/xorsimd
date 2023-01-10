@@ -5,7 +5,10 @@
 
 package xorsimd
 
-import "github.com/templexxx/cpu"
+import (
+	"github.com/templexxx/cpu"
+	"runtime"
+)
 
 // EnableAVX512 may slow down CPU Clock (maybe not).
 // TODO need more research:
@@ -19,6 +22,7 @@ const (
 	avx512 = iota
 	avx2
 	sse2
+	neon
 	generic
 )
 
@@ -28,8 +32,12 @@ func getCPUFeature() int {
 		return avx512
 	} else if cpu.X86.HasAVX2 {
 		return avx2
+	} else if runtime.GOARCH == "amd64" {
+		return sse2 // amd64 must have sse2
+	} else if runtime.GOARCH == "arm64" {
+		return neon
 	} else {
-		return sse2 // amd64 must has sse2
+		return generic
 	}
 }
 
@@ -86,4 +94,11 @@ func checkLen(dst []byte, src [][]byte) int {
 // len(dst), len(a), len(b).
 func Bytes(dst, a, b []byte) int {
 	return Encode(dst, [][]byte{a, b})
+}
+
+type queue struct {
+	mask uint32
+	buff []byte
+	cons uint32
+	prod uint32
 }
