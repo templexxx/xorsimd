@@ -5,6 +5,8 @@
 
 package xorsimd
 
+import "github.com/templexxx/cpu"
+
 func encode(dst []byte, src [][]byte) {
 
 	switch cpuFeature {
