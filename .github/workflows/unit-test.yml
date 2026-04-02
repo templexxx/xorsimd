@@ -11,7 +11,11 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [1.24.x, 1.25.x, 1.26.x]
+        os: [ubuntu-latest, macos-latest, windows-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Check out code
@@ -20,7 +24,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.25.4
+          go-version: ${{ matrix.go-version }}
 
       - name: Get dependencies
         run: go mod download
