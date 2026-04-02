@@ -7,7 +7,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build !amd64
+//go:build !amd64
 
 package xorsimd
 
@@ -16,8 +16,11 @@ import (
 	"unsafe"
 )
 
-const wordSize = int(unsafe.Sizeof(uintptr(0)))
 const supportsUnaligned = runtime.GOARCH == "386" || runtime.GOARCH == "ppc64" || runtime.GOARCH == "ppc64le" || runtime.GOARCH == "s390x"
+
+func getCPUFeature() int {
+	return generic
+}
 
 func encode(dst []byte, src [][]byte) {
 	if supportsUnaligned {

@@ -76,8 +76,6 @@ func TestBytes16(t *testing.T) {
 	}
 }
 
-const wordSize = int(unsafe.Sizeof(uintptr(0)))
-
 func TestBytes8Align(t *testing.T) {
 
 	rand.Seed(time.Now().UnixNano())
@@ -258,7 +256,7 @@ func TestBytes(t *testing.T) {
 					fillRandom(q)
 
 					Bytes(d1, p, q)
-					n := min(p, q, d1)
+					n := getMinLen(p, q, d1)
 					for i := 0; i < n; i++ {
 						d2[i] = p[i] ^ q[i]
 					}
@@ -271,7 +269,7 @@ func TestBytes(t *testing.T) {
 	}
 }
 
-func min(a, b, c []byte) int {
+func getMinLen(a, b, c []byte) int {
 	n := len(a)
 	if len(b) < n {
 		n = len(b)
@@ -283,20 +281,20 @@ func min(a, b, c []byte) int {
 }
 
 func TestEncodeWithFeature(t *testing.T) {
-	max := testSize
+	maxSize := testSize
 
 	switch getCPUFeature() {
 	case avx512:
-		testEncode(t, max, sse2, -1)
-		testEncode(t, max, avx2, sse2)
-		testEncode(t, max, avx512, avx2)
+		testEncode(t, maxSize, sse2, -1)
+		testEncode(t, maxSize, avx2, sse2)
+		testEncode(t, maxSize, avx512, avx2)
 	case avx2:
-		testEncode(t, max, sse2, -1)
-		testEncode(t, max, avx2, sse2)
+		testEncode(t, maxSize, sse2, -1)
+		testEncode(t, maxSize, avx2, sse2)
 	case sse2:
-		testEncode(t, max, sse2, -1)
+		testEncode(t, maxSize, sse2, -1)
 	case generic:
-		testEncode(t, max, generic, -1)
+		testEncode(t, maxSize, generic, -1)
 	}
 }
 

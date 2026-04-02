@@ -18,6 +18,16 @@ func encode(dst []byte, src [][]byte) {
 	return
 }
 
+func getCPUFeature() int {
+	if hasAVX512() && EnableAVX512 {
+		return avx512
+	} else if cpu.X86.HasAVX2 {
+		return avx2
+	} else {
+		return sse2 // amd64 must have sse2
+	}
+}
+
 // Bytes8 XORs of 8 Bytes.
 // The slice arguments a, b, dst's lengths are assumed to be at least 8,
 // if not, Bytes8 will panic.

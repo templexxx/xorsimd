@@ -5,7 +5,13 @@
 
 package xorsimd
 
-import "github.com/templexxx/cpu"
+import (
+	"unsafe"
+
+	"github.com/templexxx/cpu"
+)
+
+const wordSize = int(unsafe.Sizeof(uintptr(0)))
 
 // EnableAVX512 may slow down CPU Clock (maybe not).
 // TODO need more research:
@@ -23,15 +29,6 @@ const (
 )
 
 // TODO: Add ARM feature...
-func getCPUFeature() int {
-	if hasAVX512() && EnableAVX512 {
-		return avx512
-	} else if cpu.X86.HasAVX2 {
-		return avx2
-	} else {
-		return sse2 // amd64 must has sse2
-	}
-}
 
 func hasAVX512() (ok bool) {
 
