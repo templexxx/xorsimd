@@ -13,9 +13,9 @@ import (
 
 const wordSize = int(unsafe.Sizeof(uintptr(0)))
 
-// EnableAVX512 may slow down CPU Clock (maybe not).
-// TODO need more research:
-// https://lemire.me/blog/2018/04/19/by-how-much-does-avx-512-slow-down-your-cpu-a-first-experiment/
+// EnableAVX512 controls whether AVX-512 is considered during feature detection.
+// Note: instruction-path selection is decided at package initialization, so
+// changing this value afterwards does not refresh the selected backend.
 var EnableAVX512 = true
 
 // cpuFeature indicates which instruction set will be used.
@@ -38,10 +38,13 @@ func hasAVX512() (ok bool) {
 		cpu.X86.HasAVX512DQ
 }
 
-// Encode encodes elements from source slice into a
-// destination slice. The source and destination may overlap.
-// Encode returns the number of bytes encoded, which will be the minimum of
-// len(src[i]) and len(dst).
+// Encode XORs all source rows into dst.
+// The source and destination may overlap.
+//
+// Encode returns the number of bytes processed, which is the minimum length of
+// dst and every source row.
+//
+// Callers must provide at least one source row: len(src) >= 1.
 func Encode(dst []byte, src [][]byte) (n int) {
 	n = checkLen(dst, src)
 	if n == 0 {
@@ -76,11 +79,11 @@ func checkLen(dst []byte, src [][]byte) int {
 	return n
 }
 
-// Bytes XORs the bytes in a and b into a
-// destination slice. The source and destination may overlap.
+// Bytes XORs a and b into dst.
+// The source and destination may overlap.
 //
-// Bytes returns the number of bytes encoded, which will be the minimum of
-// len(dst), len(a), len(b).
+// Bytes returns the number of bytes processed, which is the minimum of
+// len(dst), len(a), and len(b).
 func Bytes(dst, a, b []byte) int {
 	return Encode(dst, [][]byte{a, b})
 }

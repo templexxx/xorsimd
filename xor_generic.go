@@ -36,7 +36,7 @@ func encode(dst []byte, src [][]byte) {
 
 }
 
-// fastEncode xor in bulk. It only works on architectures that
+// fastEncode XORs in bulk. It only works on architectures that
 // support unaligned read/writes.
 func fastEncode(dst []byte, src [][]byte, n int) {
 	w := n / wordSize
@@ -86,23 +86,21 @@ func safeEncode(dst []byte, src [][]byte, n int) {
 	}
 }
 
-// Bytes8 XORs of word 8 Bytes.
-// The slice arguments a, b, dst's lengths are assumed to be at least 8,
-// if not, Bytes8 will panic.
+// Bytes8 XORs exactly 8 bytes from a and b into dst.
+// Each slice must have length >= 8, otherwise it panics.
 func Bytes8(dst, a, b []byte) {
 
 	bytesWords(dst[:8], a[:8], b[:8])
 }
 
-// Bytes16 XORs of packed doubleword 16 Bytes.
-// The slice arguments a, b, dst's lengths are assumed to be at least 16,
-// if not, Bytes16 will panic.
+// Bytes16 XORs exactly 16 bytes from a and b into dst.
+// Each slice must have length >= 16, otherwise it panics.
 func Bytes16(dst, a, b []byte) {
 
 	bytesWords(dst[:16], a[:16], b[:16])
 }
 
-// bytesWords XORs multiples of 4 or 8 bytes (depending on architecture.)
+// bytesWords XORs multiples of 4 or 8 bytes (depending on architecture).
 // The slice arguments a and b are assumed to be of equal length.
 func bytesWords(dst, a, b []byte) {
 	if supportsUnaligned {
@@ -121,30 +119,28 @@ func bytesWords(dst, a, b []byte) {
 	}
 }
 
-// Bytes8Align XORs of 8 Bytes.
-// The slice arguments a, b, dst's lengths are assumed to be at least 8,
-// if not, Bytes8 will panic.
+// Bytes8Align XORs exactly 8 bytes from a and b into dst.
+// Each slice must have length >= 8, otherwise it panics.
 //
-// All the byte slices must be aligned to wordsize.
+// All byte slices must be aligned to wordSize.
 func Bytes8Align(dst, a, b []byte) {
 
 	bytesWordsAlign(dst[:8], a[:8], b[:8])
 }
 
-// Bytes16Align XORs of packed 16 Bytes.
-// The slice arguments a, b, dst's lengths are assumed to be at least 16,
-// if not, Bytes16 will panic.
+// Bytes16Align XORs exactly 16 bytes from a and b into dst.
+// Each slice must have length >= 16, otherwise it panics.
 //
-// All the byte slices must be aligned to wordsize.
+// All byte slices must be aligned to wordSize.
 func Bytes16Align(dst, a, b []byte) {
 
 	bytesWordsAlign(dst[:16], a[:16], b[:16])
 }
 
-// bytesWordsAlign XORs multiples of 4 or 8 bytes (depending on architecture.)
+// bytesWordsAlign XORs multiples of 4 or 8 bytes (depending on architecture).
 // The slice arguments a and b are assumed to be of equal length.
 //
-// All the byte slices must be aligned to wordsize.
+// All byte slices must be aligned to wordSize.
 func bytesWordsAlign(dst, a, b []byte) {
 	dw := *(*[]uintptr)(unsafe.Pointer(&dst))
 	aw := *(*[]uintptr)(unsafe.Pointer(&a))
@@ -155,28 +151,22 @@ func bytesWordsAlign(dst, a, b []byte) {
 	}
 }
 
-// BytesA XORs the len(a) bytes in a and b into a
-// destination slice.
-// The destination should have enough space.
+// BytesA XORs len(a) bytes from a and b into dst.
+// Callers must ensure len(dst) >= len(a) and len(b) >= len(a).
 //
-// It's used for encoding small bytes slices (< dozens bytes),
-// and the slices may not be aligned to 8 bytes or 16 bytes.
-// If the length is big, it's better to use 'func Bytes(dst, a, b []byte)' instead
-// for gain better performance.
+// This helper is intended for small slices where setup overhead dominates.
+// For larger slices, Bytes is usually faster.
 func BytesA(dst, a, b []byte) {
 
 	n := len(a)
 	bytesN(dst[:n], a[:n], b[:n], n)
 }
 
-// BytesB XORs the len(b) bytes in a and b into a
-// destination slice.
-// The destination should have enough space.
+// BytesB XORs len(b) bytes from a and b into dst.
+// Callers must ensure len(dst) >= len(b) and len(a) >= len(b).
 //
-// It's used for encoding small bytes slices (< dozens bytes),
-// and the slices may not be aligned to 8 bytes or 16 bytes.
-// If the length is big, it's better to use 'func Bytes(dst, a, b []byte)' instead
-// for gain better performance.
+// This helper is intended for small slices where setup overhead dominates.
+// For larger slices, Bytes is usually faster.
 func BytesB(dst, a, b []byte) {
 
 	n := len(b)

@@ -30,59 +30,53 @@ func getCPUFeature() int {
 	}
 }
 
-// Bytes8 XORs of 8 Bytes.
-// The slice arguments a, b, dst's lengths are assumed to be at least 8,
-// if not, Bytes8 will panic.
+// Bytes8 XORs exactly 8 bytes from a and b into dst.
+// Each slice must have length >= 8, otherwise it panics.
 func Bytes8(dst, a, b []byte) {
 
 	bytes8(&dst[0], &a[0], &b[0])
 }
 
-// Bytes16 XORs of packed 16 Bytes.
-// The slice arguments a, b, dst's lengths are assumed to be at least 16,
-// if not, Bytes16 will panic.
+// Bytes16 XORs exactly 16 bytes from a and b into dst.
+// Each slice must have length >= 16, otherwise it panics.
 func Bytes16(dst, a, b []byte) {
 
 	bytes16(&dst[0], &a[0], &b[0])
 }
 
-// Bytes8Align XORs of 8 Bytes.
-// The slice arguments a, b, dst's lengths are assumed to be at least 8,
-// if not, Bytes8 will panic.
+// Bytes8Align XORs exactly 8 bytes from a and b into dst.
+// Each slice must have length >= 8, otherwise it panics.
+// On amd64, explicit alignment is not required; this function exists for API
+// compatibility with non-amd64 implementations.
 func Bytes8Align(dst, a, b []byte) {
 
 	bytes8(&dst[0], &a[0], &b[0])
 }
 
-// Bytes16Align XORs of packed 16 Bytes.
-// The slice arguments a, b, dst's lengths are assumed to be at least 16,
-// if not, Bytes16 will panic.
+// Bytes16Align XORs exactly 16 bytes from a and b into dst.
+// Each slice must have length >= 16, otherwise it panics.
+// On amd64, explicit alignment is not required; this function exists for API
+// compatibility with non-amd64 implementations.
 func Bytes16Align(dst, a, b []byte) {
 
 	bytes16(&dst[0], &a[0], &b[0])
 }
 
-// BytesA XORs the len(a) bytes in a and b into a
-// destination slice.
-// The destination should have enough space.
+// BytesA XORs len(a) bytes from a and b into dst.
+// Callers must ensure len(dst) >= len(a) and len(b) >= len(a).
 //
-// It's used for encoding small bytes slices (< dozens bytes),
-// and the slices may not be aligned to 8 bytes or 16 bytes.
-// If the length is big, it's better to use 'func Bytes(dst, a, b []byte)' instead
-// for gain better performance.
+// This helper is intended for small slices where setup overhead dominates.
+// For larger slices, Bytes is usually faster.
 func BytesA(dst, a, b []byte) {
 
 	bytesN(&dst[0], &a[0], &b[0], len(a))
 }
 
-// BytesB XORs the len(b) bytes in a and b into a
-// destination slice.
-// The destination should have enough space.
+// BytesB XORs len(b) bytes from a and b into dst.
+// Callers must ensure len(dst) >= len(b) and len(a) >= len(b).
 //
-// It's used for encoding small bytes slices (< dozens bytes),
-// and the slices may not be aligned to 8 bytes or 16 bytes.
-// If the length is big, it's better to use 'func Bytes(dst, a, b []byte)' instead
-// for gain better performance.
+// This helper is intended for small slices where setup overhead dominates.
+// For larger slices, Bytes is usually faster.
 func BytesB(dst, a, b []byte) {
 
 	bytesN(&dst[0], &a[0], &b[0], len(b))
